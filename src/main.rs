@@ -65,19 +65,14 @@ async fn main() -> Result<(), ProviderError> {
     println!("Elapsed time Local Node: {:.2?}", now.elapsed());
 
     let now = Instant::now();
-    benchmark_contract_call(
-        alchemy_w3.clone(),
-        uniswap_v3_pool_address.clone(),
-        uniswap_v3_pool_abi.clone(),
-    )
-    .await?;
+    benchmark_contract_call(&alchemy_w3, &uniswap_v3_pool_address, &uniswap_v3_pool_abi).await?;
     println!("Elapsed time Alchemy: {:?}", now.elapsed());
 
     let now = Instant::now();
     benchmark_contract_call(
-        local_node_w3.clone(),
-        uniswap_v3_pool_address.clone(),
-        uniswap_v3_pool_abi.clone(),
+        &local_node_w3,
+        &uniswap_v3_pool_address,
+        &uniswap_v3_pool_abi,
     )
     .await
     .unwrap();
@@ -95,13 +90,17 @@ async fn benchmark_req(prov: &Provider<Http>, block_number: &U64) -> Result<(), 
 }
 
 async fn benchmark_contract_call(
-    prov: Provider<Http>,
-    swap_address: Address,
-    abi: Abi,
+    prov: &Provider<Http>,
+    swap_address: &Address,
+    abi: &Abi,
 ) -> Result<(), ProviderError> {
-    let arked_prov = Arc::new(prov);
-    let pool = Contract::new(swap_address, abi, arked_prov.clone());
-    let factory_address = pool.connect(arked_prov.clone()).address();
+    let arked_prov = Arc::new(prov.to_owned());
+    let pool = Contract::new(
+        swap_address.to_owned(),
+        abi.to_owned(),
+        arked_prov.to_owned(),
+    );
+    let factory_address = pool.connect(arked_prov.to_owned()).address();
     println!("factory address: {:?}", factory_address);
     Ok(())
 }
