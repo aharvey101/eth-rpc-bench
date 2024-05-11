@@ -8,4 +8,6 @@ edition = "2021"
 [dependencies]
 dotenv = "0.15.0"
 ethers = "2.0.14"
+serde = "1.0.201"
+serde_json = "1.0.117"
 tokio = { version = "1.37.0", features = ["full"] }
